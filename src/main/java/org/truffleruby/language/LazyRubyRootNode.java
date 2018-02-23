@@ -106,7 +106,7 @@ public class LazyRubyRootNode extends RubyBaseRootNode implements InternalRootNo
 
     @TruffleBoundary
     private void printTimeMetric(String id) {
-        RubyLauncher.printTruffleTimeMetric(id);
+        RubyLauncher.Metrics.printTruffleTime(id);
     }
 
     @Override

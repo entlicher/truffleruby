@@ -365,7 +365,7 @@ public abstract class TruffleBootNodes {
         @TruffleBoundary
         @Specialization(guards = "isRubySymbol(name)")
         public Object printTimeMetric(DynamicObject name) {
-            RubyLauncher.printTruffleTimeMetric(Layouts.SYMBOL.getString(name));
+            RubyLauncher.Metrics.printTruffleTime(Layouts.SYMBOL.getString(name));
             return nil();
         }
 
