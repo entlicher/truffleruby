@@ -87,40 +87,33 @@ CP=""
 java_args+=("-XX:MetaspaceSize=25M")
 
 # Truffle
-binary_truffle="$root/mx.imports/binary/truffle/mxbuild"
-source_truffle="$root_parent/graal/truffle/mxbuild"
-bootcp=()
-if [ -f "$binary_truffle/dists/truffle-api.jar" ]; then # Binary Truffle suite
-    truffle="$binary_truffle"
-    bootcp+=(
-        "$binary_truffle/dists/truffle-api.jar"
-        "$(dirname "$binary_truffle")/mx.imports/binary/sdk/mxbuild/dists/graal-sdk.jar"
-        "$(dirname "$binary_truffle")/mx.imports/binary/sdk/mxbuild/dists/launcher-common.jar"
-        "$(dirname "$binary_truffle")/mx.imports/binary/tools/mxbuild/dists/chromeinspector.jar"
-        "$(dirname "$binary_truffle")/mx.imports/binary/tools/mxbuild/dists/truffle-profiler.jar"
-    )
-elif [ -f "$source_truffle/dists/truffle-api.jar" ]; then # Source Truffle suite
-    truffle="$source_truffle"
-    bootcp+=(
-        "$source_truffle/dists/truffle-api.jar"
-        "$root_parent/graal/sdk/mxbuild/dists/graal-sdk.jar"
-        "$root_parent/graal/sdk/mxbuild/dists/launcher-common.jar"
-        "$root_parent/graal/tools/mxbuild/dists/chromeinspector.jar"
-        "$root_parent/graal/tools/mxbuild/dists/truffle-profiler.jar"
-    )
+binary_prefix="$root/mx.imports/binary"
+source_prefix="$root_parent"
+if [ -f "$binary_prefix/graal/truffle/mxbuild/dists/truffle-api.jar" ]; then # Binary Truffle suite
+    prefix=$binary_prefix
+elif [ -f "$source_prefix/graal/truffle/mxbuild/dists/truffle-api.jar" ]; then # Source Truffle suite
+    prefix=$source_prefix
 else
     echo "Could not find Truffle jars" 1>&2
     exit 1
 fi
 
+bootcp=(
+    "$prefix/graal/truffle/mxbuild/dists/truffle-api.jar"
+    "$prefix/graal/sdk/mxbuild/dists/graal-sdk.jar"
+    "$prefix/graal/sdk/mxbuild/dists/launcher-common.jar"
+    "$prefix/graal/tools/mxbuild/dists/chromeinspector.jar"
+    "$prefix/graal/tools/mxbuild/dists/truffle-profiler.jar"
+)
+
 function join_array { local IFS="$1"; shift; echo "$*"; }
-java_args+=("-Xbootclasspath/a:$(join_array ':' ${bootcp[@]})")
-CP="$CP:$truffle/dists/truffle-nfi.jar"
+java_args+=("-Xbootclasspath/a:$(join_array ':' "${bootcp[@]}")")
+CP="$CP:$prefix/graal/truffle/mxbuild/dists/truffle-nfi.jar"
 CP="$CP:$root/mxbuild/dists/truffleruby-launcher.jar"
 CP="$CP:$root/mxbuild/dists/truffleruby.jar"
 
-libtrufflenfi_os_arch="$truffle/$os-$arch/truffle-nfi-native/bin/libtrufflenfi.$libext"
-libtrufflenfi_no_arch="$truffle/truffle-nfi-native/bin/libtrufflenfi.$libext"
+libtrufflenfi_os_arch="$prefix/graal/truffle/mxbuild/$os-$arch/truffle-nfi-native/bin/libtrufflenfi.$libext"
+libtrufflenfi_no_arch="$prefix/graal/truffle/mxbuild/truffle-nfi-native/bin/libtrufflenfi.$libext"
 if [ -f "$libtrufflenfi_os_arch" ]; then
   libtrufflenfi="$libtrufflenfi_os_arch"
 elif [ -f "$libtrufflenfi_no_arch" ]; then
