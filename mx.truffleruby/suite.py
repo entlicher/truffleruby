@@ -275,7 +275,7 @@ suite = {
         },
 
         "TRUFFLERUBY": {
-            "mainClass": "org.truffleruby.Main",
+            "mainClass": "org.truffleruby.launcher.RubyLauncher",
             "dependencies": [
                 "truffleruby",
                 "truffleruby-core",

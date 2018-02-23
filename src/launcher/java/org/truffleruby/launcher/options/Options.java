@@ -17,6 +17,7 @@ import javax.annotation.Generated;
 public class Options {
 
     public final String HOME;
+    public final boolean NO_HOME_PROVIDED;
     public final String LAUNCHER;
     public final boolean EMBEDDED;
     public final String[] LOAD_PATHS;
@@ -41,6 +42,7 @@ public class Options {
     public final boolean FROZEN_STRING_LITERALS;
     public final boolean RUBYGEMS;
     public final boolean LAZY_RUBYGEMS;
+    public final boolean POST_BOOT;
     public final boolean PATCHING;
     public final boolean DID_YOU_MEAN;
     public final String INTERNAL_ENCODING;
@@ -140,6 +142,7 @@ public class Options {
     
     Options(OptionsBuilder builder) {
         HOME = builder.getOrDefault(OptionsCatalog.HOME);
+        NO_HOME_PROVIDED = builder.getOrDefault(OptionsCatalog.NO_HOME_PROVIDED);
         LAUNCHER = builder.getOrDefault(OptionsCatalog.LAUNCHER);
         EMBEDDED = builder.getOrDefault(OptionsCatalog.EMBEDDED);
         LOAD_PATHS = builder.getOrDefault(OptionsCatalog.LOAD_PATHS);
@@ -164,6 +167,7 @@ public class Options {
         FROZEN_STRING_LITERALS = builder.getOrDefault(OptionsCatalog.FROZEN_STRING_LITERALS);
         RUBYGEMS = builder.getOrDefault(OptionsCatalog.RUBYGEMS);
         LAZY_RUBYGEMS = builder.getOrDefault(OptionsCatalog.LAZY_RUBYGEMS, DEFAULT_LAZY);
+        POST_BOOT = builder.getOrDefault(OptionsCatalog.POST_BOOT);
         PATCHING = builder.getOrDefault(OptionsCatalog.PATCHING);
         DID_YOU_MEAN = builder.getOrDefault(OptionsCatalog.DID_YOU_MEAN);
         INTERNAL_ENCODING = builder.getOrDefault(OptionsCatalog.INTERNAL_ENCODING);
@@ -266,6 +270,8 @@ public class Options {
         switch (description.getName()) {
             case "ruby.home":
                 return HOME;
+            case "ruby.no_home_provided":
+                return NO_HOME_PROVIDED;
             case "ruby.launcher":
                 return LAUNCHER;
             case "ruby.embedded":
@@ -314,6 +320,8 @@ public class Options {
                 return RUBYGEMS;
             case "ruby.rubygems.lazy":
                 return LAZY_RUBYGEMS;
+            case "ruby.post_boot":
+                return POST_BOOT;
             case "ruby.patching":
                 return PATCHING;
             case "ruby.did_you_mean":

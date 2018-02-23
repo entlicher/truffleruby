@@ -182,7 +182,7 @@ describe "The launcher" do
   it "prints an error for an unknown option" do
     out = `#{RbConfig.ruby} -Xunknown 2>&1`
     $?.success?.should == false
-    out.should include("unknown option")
+    out.should include("Unrecognized argument")
   end
 
   describe 'StringArray option' do

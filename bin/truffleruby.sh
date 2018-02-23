@@ -89,19 +89,32 @@ java_args+=("-XX:MetaspaceSize=25M")
 # Truffle
 binary_truffle="$root/mx.imports/binary/truffle/mxbuild"
 source_truffle="$root_parent/graal/truffle/mxbuild"
+bootcp=()
 if [ -f "$binary_truffle/dists/truffle-api.jar" ]; then # Binary Truffle suite
     truffle="$binary_truffle"
-    graal_sdk="$(dirname "$binary_truffle")/mx.imports/binary/sdk/mxbuild/dists/graal-sdk.jar"
-    launcher_common="$(dirname "$binary_truffle")/mx.imports/binary/sdk/mxbuild/dists/launcher-common.jar"
+    bootcp+=(
+        "$binary_truffle/dists/truffle-api.jar"
+        "$(dirname "$binary_truffle")/mx.imports/binary/sdk/mxbuild/dists/graal-sdk.jar"
+        "$(dirname "$binary_truffle")/mx.imports/binary/sdk/mxbuild/dists/launcher-common.jar"
+        "$(dirname "$binary_truffle")/mx.imports/binary/tools/mxbuild/dists/chromeinspector.jar"
+        "$(dirname "$binary_truffle")/mx.imports/binary/tools/mxbuild/dists/truffle-profiler.jar"
+    )
 elif [ -f "$source_truffle/dists/truffle-api.jar" ]; then # Source Truffle suite
     truffle="$source_truffle"
-    graal_sdk="$root_parent/graal/sdk/mxbuild/dists/graal-sdk.jar"
-    launcher_common="$root_parent/graal/sdk/mxbuild/dists/launcher-common.jar"
+    bootcp+=(
+        "$source_truffle/dists/truffle-api.jar"
+        "$root_parent/graal/sdk/mxbuild/dists/graal-sdk.jar"
+        "$root_parent/graal/sdk/mxbuild/dists/launcher-common.jar"
+        "$root_parent/graal/tools/mxbuild/dists/chromeinspector.jar"
+        "$root_parent/graal/tools/mxbuild/dists/truffle-profiler.jar"
+    )
 else
     echo "Could not find Truffle jars" 1>&2
     exit 1
 fi
-java_args+=("-Xbootclasspath/a:$truffle/dists/truffle-api.jar:$graal_sdk:$launcher_common")
+
+function join_array { local IFS="$1"; shift; echo "$*"; }
+java_args+=("-Xbootclasspath/a:$(join_array ':' ${bootcp[@]})")
 CP="$CP:$truffle/dists/truffle-nfi.jar"
 CP="$CP:$root/mxbuild/dists/truffleruby-launcher.jar"
 CP="$CP:$root/mxbuild/dists/truffleruby.jar"
@@ -214,7 +227,7 @@ fi
 full_command=(
     "$JAVACMD"
     "${java_args[@]}"
-    org.truffleruby.Main
+    org.truffleruby.launcher.RubyLauncher
     "-Xhome=$root"
     "-Xlauncher=$root/bin/truffleruby"
     "${ruby_args[@]}"
