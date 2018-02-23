@@ -439,6 +439,7 @@ public class RubyLauncher extends AbstractLanguageLauncher {
         out.println("  -h              show this message, --help for more info");
     }
 
+    // TODO (pitr-ch 23-Feb-2018): move out of RubyLauncher, when isAot is public
     public static class Metrics {
 
         // These system properties are used before outside the SDK option system
