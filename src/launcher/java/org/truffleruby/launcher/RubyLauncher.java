@@ -24,6 +24,7 @@ import org.truffleruby.launcher.options.OptionsCatalog;
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,8 +55,27 @@ public class RubyLauncher extends AbstractLanguageLauncher {
         new RubyLauncher().launch(args);
     }
 
+    public static boolean isGraalVM() {
+        return System.getProperty("org.graalvm.home") != null;
+    }
+
     // TODO (pitr-ch 22-Feb-2018): replace with a call to sdk API when available
     static boolean isGraal() {
+        if (isGraalVM() || isAOT()) {
+            return true;
+        }
+
+        try {
+            final Class<?> truffleClass = RubyLauncher.class.getClassLoader().loadClass("com.oracle.truffle.api.Truffle");
+            final Class<?> truffleRuntimeClass = RubyLauncher.class.getClassLoader().loadClass("com.oracle.truffle.api.TruffleRuntime");
+            final Method getTruffleRuntime = truffleClass.getDeclaredMethod("getRuntime");
+            final Method getName = truffleRuntimeClass.getDeclaredMethod("getName");
+
+            return ((String) getName.invoke(getTruffleRuntime.invoke(null))).toLowerCase(Locale.ENGLISH).contains("graal");
+        } catch (NoSuchMethodException | ClassNotFoundException | InvocationTargetException | IllegalAccessException e) {
+            // ignore and fallback to using Ruby Context
+        }
+
         final CommandLineOptions config = new CommandLineOptions();
         config.setOption(OptionsCatalog.GRAAL_WARNING_UNLESS, false);
         config.setOption(OptionsCatalog.POST_BOOT, false);
@@ -325,7 +346,6 @@ public class RubyLauncher extends AbstractLanguageLauncher {
         }
         return null;
     }
-
 
     private static Path getGraalVMHome() {
         final String graalVMHome = System.getProperty("org.graalvm.home");
