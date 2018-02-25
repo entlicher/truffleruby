@@ -205,12 +205,12 @@ public class RubyMessageResolution {
         private final BranchProfile exceptionProfile = BranchProfile.create();
 
         protected Object access(VirtualFrame frame, DynamicObject object, Object name) {
-            try {
+            // try {
                 return helperNode.executeStringCachingHelper(frame, object, name);
-            } catch (RaiseException e) {
-                exceptionProfile.enter();
-                throw UnknownIdentifierException.raise(toString(name));
-            }
+            // } catch (RaiseException e) {
+            // exceptionProfile.enter();
+            // throw UnknownIdentifierException.raise(toString(name));
+            // }
         }
 
         @TruffleBoundary
